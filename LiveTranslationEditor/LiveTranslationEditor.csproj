@@ -10,7 +10,6 @@
     <DebugSymbols Condition="'$(Configuration)'=='Release'">False</DebugSymbols>
     <DebugSymbols Condition="'$(Configuration)'=='Debug'">True</DebugSymbols>
     <DebugType Condition="'$(Configuration)'=='Debug'">Embedded</DebugType>
-    <TargetExt>.euis</TargetExt>
     <Bursted>false</Bursted>
     <DefineConstants Condition="$(Bursted)">BURST</DefineConstants>
   </PropertyGroup>
@@ -73,15 +72,15 @@
     <XmlPoke XmlInputPath="$(PublishConfigurationPath)" Value="$([System.IO.File]::ReadAllText($(ProjectDir)changelog.md)))" Query="//ChangeLog" />
   </Target>
 
-  <!--<Target Name="EUIS Build" BeforeTargets="DeployWIP" AfterTargets="RunModPostProcessor">
+  <Target Name="EUIS Build" BeforeTargets="DeployWIP" AfterTargets="RunModPostProcessor">
     <Message Importance="high" Text="EUIS Build!" />
-    <MSBuild Projects="../WE_EUIS/WE_EUIS.csproj" Targets="Build" BuildInParallel="false" />
+    <MSBuild Projects="../LTE_EUIS/LTE_EUIS.csproj" Targets="Build" BuildInParallel="false" />
     <ItemGroup>
-      <EuisResult Include="..\WE_EUIS\bin\$(Configuration)\$(TargetFramework)\*.euis" />
+      <EuisResult Include="..\LTE_EUIS\bin\$(Configuration)\$(TargetFramework)\*.euis" />
     </ItemGroup>
     <Copy SourceFiles="@(EuisResult)" DestinationFolder="$(OutDir)" ContinueOnError="false" />
     
-  </Target>-->
+  </Target>
 
 
   <ItemGroup>

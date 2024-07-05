@@ -17,17 +17,17 @@ export default class Root extends Component<any, State> {
   }
   componentDidMount() {
     engine.whenReady.then(() => {
-      
+
     })
   }
 
 
 
   render() {
- 
-    return <>
-      {/* <button style={{ position: "fixed", right: 0, top: 0, zIndex: 999 }} onClick={() => location.reload()}>RELOAD!!!</button> */}
 
+    return <>
+      <button style={{ position: "fixed", right: 0, top: 0, zIndex: 999 }} onClick={() => location.reload()}>RELOAD!!!</button>
+      <div>Hello World!!!</div>
     </>;
 
 
