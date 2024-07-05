@@ -1,0 +1,14 @@
+<Publish>
+  <ModId Value="" />
+  <DisplayName Value="Live Translation Editor" />
+  <ShortDescription Value="Edit translations directly ingame! Export csv files to share later." />
+  <LongDescription>)</LongDescription>
+  <Thumbnail Value="Properties/Thumbnail.png" />
+  <ForumLink Value="" />
+  <ModVersion Value="0.0.0.0" />
+  <GameVersion Value="1.1.*" />
+  <ChangeLog>)</ChangeLog>
+  <Tag Value="Code Mod" />
+  <Dependency Id="74151" ModVersion="" DisplayName="Extra UI Screens" />
+  <Dependency Id="74417" ModVersion="" DisplayName="Unified Icon Library" />
+</Publish>

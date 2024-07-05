@@ -1,0 +1,237 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <Configurations>Debug;Release</Configurations>
+    <LangVersion>10.0</LangVersion>
+    <DebugType Condition="'$(Configuration)'=='Release'">None</DebugType>
+    <DebugSymbols Condition="'$(Configuration)'=='Release'">False</DebugSymbols>
+    <DebugSymbols Condition="'$(Configuration)'=='Debug'">True</DebugSymbols>
+    <DebugType Condition="'$(Configuration)'=='Debug'">Embedded</DebugType>
+    <!--The folder where Cities2.exe is located. Set it only if the game is not installed in the default location, otherwise keep it empty-->
+    <CustomInstallationPath></CustomInstallationPath>
+
+    <!--The file where mod information which is required for publishing mod on PDX mods are stored-->
+    <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
+    <Bursted>false</Bursted>
+    <DefineConstants Condition="$(Bursted)">BURST</DefineConstants>
+  </PropertyGroup>
+
+  <!--Imports must be after PropertyGroup block-->
+  <Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.props" />
+  <Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.targets" />
+  <Import Project="$(SolutionDir)\_Build\belzont_public.targets" />
+
+  <!--File with machine specific data - can be disabled-->
+  <Import Project="$(K45_CS2_ALLROOT)\_Shared\belzont.targets" />
+  
+  <!--Mod data-->
+  <PropertyGroup>
+    <ModId></ModId>
+    <Version>0.0.0.0</Version>
+    <GameVersion>1.1.*</GameVersion>
+    <ThumbnailPath>Properties/Thumbnail.png</ThumbnailPath>
+    <DisplayName>Live Translation Editor</DisplayName>
+    <ShortDescription>Edit translations directly ingame! Export csv files to share later.</ShortDescription>
+    <ForumLink></ForumLink>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <!--Mod multíple value data-->
+  <ItemGroup>
+    <ModTag Include="Code Mod" />
+    <Screenshots Include="Screenshots/*.jpg" />
+    <Dependency Include="EUIS">
+      <ModId>74151</ModId>
+      <DisplayName>Extra UI Screens</DisplayName>
+    </Dependency>
+    <Dependency Include="UnifiedIconLibrary">
+      <ModId>74417</ModId>
+      <DisplayName>Unified Icon Library</DisplayName>
+    </Dependency>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="Belzont.AssemblyUtility.KlyteModDescriptionAttribute">
+      <_Parameter1>$(ModId)</_Parameter1>
+      <_Parameter2>$(DisplayName)</_Parameter2>
+      <_Parameter3>$(ShortDescription)</_Parameter3>
+      <_Parameter4>$(ForumLink)</_Parameter4>
+    </AssemblyAttribute>
+  </ItemGroup>
+  <!--Publishing generation files-->
+  <Target Name="SetupAttributes" BeforeTargets="BeforeBuild">
+    <PropertyGroup>
+      <PublishContent>
+        <ModId Value="$(ModId)" />
+        <DisplayName Value="$(DisplayName)" />
+        <ShortDescription Value="$(ShortDescription)" />
+        <LongDescription />
+        <Thumbnail Value="$(ThumbnailPath)" />
+        <ForumLink Value="$(ForumLink)" />
+        <ModVersion Value="$(Version)" />
+        <GameVersion Value="$(GameVersion)" />
+        <ChangeLog />
+      </PublishContent>
+      <PublishContent>$(PublishContent)@(ModTag->'&lt;Tag Value="%(Identity)" /&gt;','%0a%0d')</PublishContent>
+      <PublishContent>$(PublishContent)@(Screenshots->'&lt;Screenshot Value="%(Identity)" /&gt;','%0a%0d')</PublishContent>
+      <PublishContent>$(PublishContent)@(Dependency->'&lt;Dependency Id="%(ModId)" ModVersion="%(Version)" DisplayName="%(DisplayName)"/&gt;','%0a%0d')</PublishContent>
+    </PropertyGroup>
+    <XmlPoke XmlInputPath="$(PublishConfigurationPath)" Value="$(PublishContent)" Query="//Publish" />
+
+    <XmlPoke XmlInputPath="$(PublishConfigurationPath)" Value="$([System.IO.File]::ReadAllText($(ProjectDir)/longDescription.md)))" Query="//LongDescription" />
+    <XmlPoke XmlInputPath="$(PublishConfigurationPath)" Value="$([System.IO.File]::ReadAllText($(ProjectDir)changelog.md)))" Query="//ChangeLog" />
+  </Target>
+
+  <!--<Target Name="EUIS Build" BeforeTargets="DeployWIP" AfterTargets="RunModPostProcessor">
+    <Message Importance="high" Text="EUIS Build!" />
+    <MSBuild Projects="../WE_EUIS/WE_EUIS.csproj" Targets="Build" BuildInParallel="false" />
+    <ItemGroup>
+      <EuisResult Include="..\WE_EUIS\bin\$(Configuration)\$(TargetFramework)\*.euis" />
+    </ItemGroup>
+    <Copy SourceFiles="@(EuisResult)" DestinationFolder="$(OutDir)" ContinueOnError="false" />
+    
+  </Target>-->
+
+
+  <ItemGroup>
+    <Reference Include="Game">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Game.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Colossal.Core">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Colossal.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Colossal.Logging">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Colossal.Logging.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Colossal.UI">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Colossal.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Colossal.UI.Binding">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Colossal.UI.Binding.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Colossal.Localization">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Colossal.Localization.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Colossal.IO.AssetDatabase">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Colossal.IO.AssetDatabase.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.Burst">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Unity.Burst.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.Collections">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Unity.Collections.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.Entities">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Unity.Entities.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.Mathematics">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Unity.Mathematics.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="cohtml.Net">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\cohtml.Net.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cohtml.Runtime">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Cohtml.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Colossal.OdinSerializer">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Colossal.OdinSerializer.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Colossal.AssetPipeline">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Colossal.AssetPipeline.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Colossal.Mono.Cecil">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Colossal.Mono.Cecil.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Colossal.Mathematics">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Colossal.Mathematics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ScreenCaptureModule">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\UnityEngine.ScreenCaptureModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Colossal.Collections">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Colossal.Collections.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule.dll">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\UnityEngine.ImageConversionModule.dll.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\System.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Update="System.Core">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\System.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Update="System.Data">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\System.Data.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="mscorlib">
+      <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\mscorlib.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(ModPropsFile)" Link="Properties\Mod.props" />
+    <None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lib.Harmony" Version="2.2.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LiveTranslationEditor.Commons\LiveTranslationEditor.Commons.csproj" />
+    <ProjectReference Include="..\_Frontends\_Frontends.csproj">
+      <Private>False</Private>
+      <CopyLocalSatelliteAssemblies>False</CopyLocalSatelliteAssemblies>
+    </ProjectReference>
+    <Content Include="..\_Frontends\bin\$(Configuration)\$(TargetFramework)\*\**\*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Update="i18n\i18n.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Resource Include="*.md" />
+
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Remove="changelog.md" />
+    <Resource Remove="longDescription.md" />
+  </ItemGroup>
+
+</Project>
