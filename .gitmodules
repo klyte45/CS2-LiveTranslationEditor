@@ -4,6 +4,3 @@
 [submodule "_Frontends/UI/_replacements"]
 	path = _Frontends/UI/_replacements
 	url = https://github.com/klyte45/CS2-EuisToolkit.git
-[submodule "LiveTranslationEditor.Commons/BelzontCommons"]
-	path = LiveTranslationEditor.Commons/BelzontCommons
-	url = https://github.com/klyte45/CS2-BelzontCommons.git

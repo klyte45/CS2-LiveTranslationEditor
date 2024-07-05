@@ -3,17 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LiveTranslationEditor.Commons", "LiveTranslationEditor.Commons\LiveTranslationEditor.Commons.csproj", "{D57166D6-5B76-45C7-9CD5-0E2C1E5F8BAE}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_Frontends", "_Frontends\_Frontends.csproj", "{CD472039-4CE4-4C97-AD7B-AAF16D70A7D3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LiveTranslationEditor.Core", "LiveTranslationEditor.Core\LiveTranslationEditor.Core.csproj", "{0D6D6D3E-F5CC-435A-B22B-AF692125ED97}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LTE_EUIS", "LTE_EUIS\LTE_EUIS.csproj", "{8EAEB452-59F3-42EB-9FCD-7EADB90F7EFC}"
-	ProjectSection(ProjectDependencies) = postProject
-		{CD472039-4CE4-4C97-AD7B-AAF16D70A7D3} = {CD472039-4CE4-4C97-AD7B-AAF16D70A7D3}
-		{D57166D6-5B76-45C7-9CD5-0E2C1E5F8BAE} = {D57166D6-5B76-45C7-9CD5-0E2C1E5F8BAE}
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LiveTranslationEditor", "LiveTranslationEditor\LiveTranslationEditor.csproj", "{0D6D6D3E-F5CC-435A-B22B-AF692125ED97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D57166D6-5B76-45C7-9CD5-0E2C1E5F8BAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D57166D6-5B76-45C7-9CD5-0E2C1E5F8BAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D57166D6-5B76-45C7-9CD5-0E2C1E5F8BAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D57166D6-5B76-45C7-9CD5-0E2C1E5F8BAE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CD472039-4CE4-4C97-AD7B-AAF16D70A7D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CD472039-4CE4-4C97-AD7B-AAF16D70A7D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD472039-4CE4-4C97-AD7B-AAF16D70A7D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,10 +21,6 @@ Global
 		{0D6D6D3E-F5CC-435A-B22B-AF692125ED97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D6D6D3E-F5CC-435A-B22B-AF692125ED97}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D6D6D3E-F5CC-435A-B22B-AF692125ED97}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8EAEB452-59F3-42EB-9FCD-7EADB90F7EFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8EAEB452-59F3-42EB-9FCD-7EADB90F7EFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8EAEB452-59F3-42EB-9FCD-7EADB90F7EFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8EAEB452-59F3-42EB-9FCD-7EADB90F7EFC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

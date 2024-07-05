@@ -10,11 +10,7 @@
     <DebugSymbols Condition="'$(Configuration)'=='Release'">False</DebugSymbols>
     <DebugSymbols Condition="'$(Configuration)'=='Debug'">True</DebugSymbols>
     <DebugType Condition="'$(Configuration)'=='Debug'">Embedded</DebugType>
-    <!--The folder where Cities2.exe is located. Set it only if the game is not installed in the default location, otherwise keep it empty-->
-    <CustomInstallationPath></CustomInstallationPath>
-
-    <!--The file where mod information which is required for publishing mod on PDX mods are stored-->
-    <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
+    <TargetExt>.euis</TargetExt>
     <Bursted>false</Bursted>
     <DefineConstants Condition="$(Bursted)">BURST</DefineConstants>
   </PropertyGroup>
@@ -53,16 +49,8 @@
     </Dependency>
   </ItemGroup>
 
-  <ItemGroup>
-    <AssemblyAttribute Include="Belzont.AssemblyUtility.KlyteModDescriptionAttribute">
-      <_Parameter1>$(ModId)</_Parameter1>
-      <_Parameter2>$(DisplayName)</_Parameter2>
-      <_Parameter3>$(ShortDescription)</_Parameter3>
-      <_Parameter4>$(ForumLink)</_Parameter4>
-    </AssemblyAttribute>
-  </ItemGroup>
   <!--Publishing generation files-->
-  <Target Name="SetupAttributes" BeforeTargets="BeforeBuild">
+  <Target Name="SetupAttributes" BeforeTargets="Publish">
     <PropertyGroup>
       <PublishContent>
         <ModId Value="$(ModId)" />
@@ -97,6 +85,12 @@
 
 
   <ItemGroup>
+    <Reference Include="K45EUIS_Ext">
+      <HintPath>$(K45_CS2_ALLROOT)\ExtraUIScreens\K45EUIS_Ext\bin\$(Configuration)\$(TargetFramework)\K45EUIS_Ext.dll</HintPath>
+      <Private>False</Private>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="Game">
       <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Game.dll</HintPath>
       <Private>false</Private>
@@ -210,12 +204,7 @@
     <None Include="$(ModPropsFile)" Link="Properties\Mod.props" />
     <None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Lib.Harmony" Version="2.2.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\LiveTranslationEditor.Commons\LiveTranslationEditor.Commons.csproj" />
     <ProjectReference Include="..\_Frontends\_Frontends.csproj">
       <Private>False</Private>
       <CopyLocalSatelliteAssemblies>False</CopyLocalSatelliteAssemblies>
@@ -228,6 +217,18 @@
     </None>
     <Resource Include="*.md" />
 
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="..\_Frontends\bin\Debug\net472\UI\images\WE.svg" />
+    <Content Remove="..\_Frontends\bin\Debug\net472\UI\k45-adr-main.css" />
+    <Content Remove="..\_Frontends\bin\Debug\net472\UI\k45-adr-main.js" />
+    <Content Remove="..\_Frontends\bin\Debug\net472\UI\k45-adr-main.js.LICENSE.txt" />
+    <Content Remove="..\_Frontends\bin\Debug\net472\UI\k45-we-main.css" />
+    <Content Remove="..\_Frontends\bin\Debug\net472\UI\k45-we-main.js" />
+    <Content Remove="..\_Frontends\bin\Debug\net472\UI\k45-we-main.js.LICENSE.txt" />
+    <Content Remove="..\_Frontends\bin\Debug\net472\UI\k45-xtm-main.css" />
+    <Content Remove="..\_Frontends\bin\Debug\net472\UI\k45-xtm-main.js" />
+    <Content Remove="..\_Frontends\bin\Debug\net472\UI\k45-xtm-main.js.LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="changelog.md" />
