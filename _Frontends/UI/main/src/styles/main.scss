@@ -1,0 +1,55 @@
+.cs2-fieldStyle {
+    &.entryLine {
+        .key {
+            color: var(--menuText1Disabled);
+            font-size: var(--fontSizeXS);
+        }
+
+        .comment {
+            font-size: var(--fontSizeXS);
+            color: var(--accentColorDark-hover);
+        }
+    }
+
+    &.thirdSelect {
+        width: 25%;
+        display: flex;
+    }
+}
+
+.belowSelectorWithBtn {
+    flex-direction: row;
+    display: flex;
+
+    .react-select-container {
+        position: relative;
+        max-width: 300rem;
+        height: 100%;
+        word-wrap: nowrap;
+
+        .list-box {
+            position: absolute;
+            bottom: 100%;
+            height: auto;
+            left: 0;
+            right: 0;
+
+            .menu-list {
+                border-top-style: solid;
+                border-bottom-style: none;
+            }
+        }
+
+        .value-control .indicators-container svg {
+            transform: rotate(180deg);
+        }
+    }
+}
+
+button[disabled] {
+    background-color: black !important;
+    color: gray !important;
+    border-width: 1rem;
+    border-style: solid;
+    border-color: gray;
+}
