@@ -3,11 +3,9 @@ import { Cs2FormLine, Cs2Select, DefaultPanelScreen, ErrorBoundary, GameScrollCo
 import "@klyte45/euis-components/src/styles/basiic-main.scss";
 import { Component } from "react";
 import { FileService } from "./FileService";
-import { I18nEditorBody } from "./I18EditorBody";
-import { EntriesData, ModEntry } from "./ModEntry";
-import { jsx, jsxs } from "react/jsx-runtime";
-import React from "react";
+import { getLangLabel, I18nEditorBody } from "./I18EditorBody";
 import { K45Markdown } from "./K45Markdown";
+import { EntriesData, ModEntry } from "./ModEntry";
 
 export type State = {
   availableMods?: ModEntry[]
@@ -37,7 +35,7 @@ export default class Root extends Component<any, State> {
   }
   componentDidMount() {
     engine.whenReady.then(async () => {
-      FileService.getModsAvailableToTranslate().then(x => { console.log(x); this.setState({ availableMods: x }) })
+      FileService.getModsAvailableToTranslate().then(x => { this.setState({ availableMods: x }) })
       FileService.getGameLanguages().then(x => this.setState({ gameSupportedLangs: x }))
     })
   }
@@ -51,7 +49,7 @@ export default class Root extends Component<any, State> {
     const filledLanguages = this.state.loadedEntries.availLangs.concat(Object.keys(this.state.extraLoadedLangs ?? {}))
     const missingDefaultGameLanguages = Object.keys(this.state.gameSupportedLangs).filter(x => !filledLanguages.includes(x));
     return <>
-      <button className="positiveBtn" disabled={!this.state.targetLanguage || this.state.isSavingFile || this.state.fileSavedMsg} onClick={() => this.saveCurrentFile()}>{
+      <button className="positiveBtn" disabled={!this.state.targetLanguage || this.state.isSavingFile || this.state.fileSavedMsg || this.state.instructionsView} onClick={() => this.saveCurrentFile()}>{
         this.state.errorCodeSaving ? "Error saving file: " + this.state.errorCodeSaving
           : this.state.fileSavedMsg ? "File saved!"
             : this.state.isSavingFile ? "Saving file..."
@@ -67,17 +65,17 @@ export default class Root extends Component<any, State> {
       {
         missingDefaultGameLanguages && <div className="belowSelectorWithBtn"><Cs2Select
           options={missingDefaultGameLanguages.map(x => { return { lang: x } })}
-          getOptionLabel={(x) => x.lang && `${this.state.gameSupportedLangs[x.lang]} (${x.lang})`}
+          getOptionLabel={(x) => x.lang ? getLangLabel(x.lang, this.state) : "Select language to add translation"}
           getOptionValue={(x) => x.lang}
           onChange={(x) => this.setLangToAdd(x.lang)}
           value={{ lang: this.state.langSelectedToAdd }}
-        /><button disabled={!this.state.langSelectedToAdd} className="positiveBtn" onClick={() => this.addLang()}>Add Translation</button></div>
+        /><button disabled={!this.state.langSelectedToAdd || this.state.instructionsView} className="positiveBtn" onClick={() => this.addLang()}>Add Translation</button></div>
       }
     </>
   }
   async loadMdInstructions() {
     const mdText = await FileService.loadInstructions(this.state.selectedMod.modId, this.state.selectedMod.mainFile);
-    this.setState({ instructionsView: true, loadedMdText: mdText || "???" });
+    this.setState({ instructionsView: true, loadedMdText: mdText || defaultInstructions });
   }
 
   saveCurrentFile(): void {
@@ -114,7 +112,8 @@ export default class Root extends Component<any, State> {
       loadedError: undefined,
       sourceLanguage: undefined,
       extraLoadedLangs: undefined,
-      targetLanguage: undefined
+      targetLanguage: undefined,
+      instructionsView: false
     }, () => x(0)));
     if (!entry) return;
     const newLoadedEntries: EntriesData = {
@@ -168,7 +167,7 @@ export default class Root extends Component<any, State> {
 
   render() {
     return <>
-      <button style={{ position: "fixed", right: 0, top: 0, zIndex: 999 }} onClick={() => location.reload()}>RELOAD!!!</button>
+      {/* <button style={{ position: "fixed", right: 0, top: 0, zIndex: 999 }} onClick={() => location.reload()}>RELOAD!!!</button> */}
       <ErrorBoundary>
         <DefaultPanelScreen title="Live Translation Editor" subtitle="Open csv translation files from mods to edit them ingame; share them with devs later!" buttonsRowContent={this.getButtons()}>
           {
@@ -197,3 +196,12 @@ export default class Root extends Component<any, State> {
   }
 }
 
+const defaultInstructions = "## There's no dev instructions for this mod...\n" +
+  "***Mod Developer:*** Add a file with name *devInstructions.md* at the same folder of the main translation file to show instructions here as reference for the translator people working in your mod.\n\n" +
+  "Interesting topics:\n- How to test the saved translation in game? (hot reload files)\n- Where to share files?\n- Where is the main discussion of this mod translation work?\n" +
+  "Supported markdown:" +
+  "\n1. Headings using # (1x for biggest, 6x for smallest)" +
+  "\n1. Lists:\n  - Unordered lists using -, \\* or + at start of line\n  - Ordered lists using ***1.*** pattern\n  - Use two spaces to create a sublist. You may mix both types in different levels" +
+  "\n1. Asterisks to emphasize text:\n  - 1 asterisk *tuns text with the current accent color*\n  - 2 asterisks **makes text bold**\n  - 3 or more asterisks ***mixes color and boldness***\n" +
+  "\n1. Links are allowed and will open the address in user browser.\n  - Use pattern [<text to show>](<url to go, with protocol>)\n  - Only http and https protocols supported\n  - The link will appear in the text [like this button is pointing to google](https://www.google.com.br), and can be placed anywhere in text\n" +
+  "\n1. To force line break in the end of a line, end it with a backslash (\\\\).\n  - The backslash may be used to escape the below characters too, but notice that not all edge cases are tested due COUI limitations.\n  - use two backslashes to show the backslash char: \\\\\\\\"

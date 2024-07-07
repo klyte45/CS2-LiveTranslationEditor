@@ -5,6 +5,9 @@ import { FileService } from "./FileService";
 
 type SetStateFn = (x: Partial<State>, callback?: () => any) => void;
 
+export function getLangLabel(lang: string, props: State) {
+  return lang ? `[${lang}] ${props.gameSupportedLangs[lang] ?? "???"}` : "<NONE>"
+}
 
 export function I18nEditorBody(props: State & { setState: SetStateFn }) {
 
@@ -14,9 +17,7 @@ export function I18nEditorBody(props: State & { setState: SetStateFn }) {
   function setTargetLanguage(x: string): void {
     props.setState({ targetLanguage: x })
   }
-  function getLangLabel(lang: string) {
-    return lang ? `${props.gameSupportedLangs[lang] ?? "???"} (${lang})` : "<NONE>"
-  }
+
   function setGroupRegex(regex: string) {
     props.setState({ selectedGroup: regex })
   }
@@ -32,18 +33,18 @@ export function I18nEditorBody(props: State & { setState: SetStateFn }) {
         <Cs2FormLine title={"Source Language"} className="thirdSelect">
           {props.loadedEntries.availLangs.length + Object.keys(props.extraLoadedLangs ?? {}).length > 1 ? <Cs2Select
             options={props.loadedEntries.availLangs.concat(Object.keys(props.extraLoadedLangs ?? {})).map(x => { return { lang: x }; })}
-            getOptionLabel={(x) => getLangLabel(x.lang)}
+            getOptionLabel={(x) => getLangLabel(x.lang, props)}
             getOptionValue={(x) => x.lang}
             onChange={(x) => setSourceLanguage(x.lang)}
-            value={{ lang: props.sourceLanguage }} /> : getLangLabel(props.loadedEntries.availLangs[0])}
+            value={{ lang: props.sourceLanguage }} /> : getLangLabel(props.loadedEntries.availLangs[0], props)}
         </Cs2FormLine>
         <Cs2FormLine title={"Target Language"} className="thirdSelect">
           {Object.keys(props.extraLoadedLangs ?? {}).length > 1 ? <><Cs2Select
             options={Object.keys(props.extraLoadedLangs).map(x => { return { lang: x }; })}
-            getOptionLabel={(x) => getLangLabel(x.lang)}
+            getOptionLabel={(x) => getLangLabel(x.lang, props)}
             getOptionValue={(x) => x.lang}
             onChange={(x) => setTargetLanguage(x.lang)}
-            value={{ lang: props.targetLanguage }} /></> : getLangLabel(props.targetLanguage)}
+            value={{ lang: props.targetLanguage }} /></> : getLangLabel(props.targetLanguage, props)}
         </Cs2FormLine>
         <Cs2FormLine title={"Key group"} className="halfSelect">
           {Object.keys(props.keyGroups ?? {}).length ? <Cs2Select

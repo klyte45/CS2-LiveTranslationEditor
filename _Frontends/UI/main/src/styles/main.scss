@@ -34,7 +34,7 @@
 
         .list-box {
             position: absolute;
-            bottom: 100%;
+            bottom: 85%;
             height: auto;
             left: 0;
             right: 0;
@@ -45,8 +45,12 @@
             }
         }
 
-        .value-control .indicators-container svg {
-            transform: rotate(180deg);
+        .value-control {
+            margin-top: 4rem;
+
+            .indicators-container svg {
+                transform: rotate(180deg);
+            }
         }
     }
 }
@@ -87,6 +91,6 @@ textarea.invalid {
     width: 100%;
     justify-content: center;
     font-size: var(--fontSizeXS);
-    padding-top: 4rem;    
+    padding-top: 4rem;
     color: var(--normalTextColorDimmer);
 }
