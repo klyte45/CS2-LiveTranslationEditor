@@ -1,11 +1,15 @@
 ///<reference path="euis.d.ts" />
-import { Cs2FormLine, Cs2Select, DefaultPanelScreen, ErrorBoundary, GameScrollComponent, Input, SimpleInput } from "@klyte45/euis-components";
-import "@klyte45/euis-components/src/styles/basiic-main.scss"
+import { Cs2FormLine, Cs2Select, DefaultPanelScreen, ErrorBoundary, GameScrollComponent } from "@klyte45/euis-components";
+import "@klyte45/euis-components/src/styles/basiic-main.scss";
 import { Component } from "react";
 import { FileService } from "./FileService";
+import { I18nEditorBody } from "./I18EditorBody";
 import { EntriesData, ModEntry } from "./ModEntry";
+import { jsx, jsxs } from "react/jsx-runtime";
+import React from "react";
+import { K45Markdown } from "./K45Markdown";
 
-type State = {
+export type State = {
   availableMods?: ModEntry[]
   selectedMod?: ModEntry
   loadedEntries?: EntriesData,
@@ -13,12 +17,16 @@ type State = {
   sourceLanguage?: string,
   targetLanguage?: string,
   extraLoadedLangs?: { [lang: string]: Record<string, string> }
-  filterKeysStarting?: string,
+  filterKeys?: string,
   gameSupportedLangs?: { [lang: string]: string },
   langSelectedToAdd?: string,
   isSavingFile?: boolean,
   fileSavedMsg?: boolean,
   errorCodeSaving?: number
+  keyGroups?: Record<string, string>
+  selectedGroup?: string,
+  instructionsView?: boolean
+  loadedMdText?: string
 }
 
 
@@ -29,13 +37,13 @@ export default class Root extends Component<any, State> {
   }
   componentDidMount() {
     engine.whenReady.then(async () => {
-      FileService.getModsAvailableToTranslate().then(x => this.setState({ availableMods: x }))
+      FileService.getModsAvailableToTranslate().then(x => { console.log(x); this.setState({ availableMods: x }) })
       FileService.getGameLanguages().then(x => this.setState({ gameSupportedLangs: x }))
     })
   }
 
   getLoadingContent() {
-    return <h3>Loading</h3>
+    return
   }
 
   getButtons() {
@@ -48,6 +56,13 @@ export default class Root extends Component<any, State> {
           : this.state.fileSavedMsg ? "File saved!"
             : this.state.isSavingFile ? "Saving file..."
               : "Save current target language file"}</button>
+      <button className="neutralBtn" onClick={() => FileService.openFileInExplorer(this.state.selectedMod.mainFile)}>Go to translations folder</button>
+      <div style={{ flexGrow: 1 }} />
+      {
+        this.state.instructionsView
+          ? <button className="neutralBtn" onClick={() => this.setState({ instructionsView: false })}>Back to editor</button>
+          : <button className="neutralBtn" onClick={() => this.loadMdInstructions()}>Check mod dev instructions</button>
+      }
       <div style={{ flexGrow: 1 }} />
       {
         missingDefaultGameLanguages && <div className="belowSelectorWithBtn"><Cs2Select
@@ -60,6 +75,11 @@ export default class Root extends Component<any, State> {
       }
     </>
   }
+  async loadMdInstructions() {
+    const mdText = await FileService.loadInstructions(this.state.selectedMod.modId, this.state.selectedMod.mainFile);
+    this.setState({ instructionsView: true, loadedMdText: mdText || "???" });
+  }
+
   saveCurrentFile(): void {
     this.setState({ isSavingFile: true }, async () => {
       const result = await FileService.saveI18nCsv(this.state.selectedMod.modId, this.state.selectedMod.mainFile, this.state.targetLanguage, Object.entries(this.state.extraLoadedLangs[this.state.targetLanguage] ?? {}))
@@ -83,82 +103,25 @@ export default class Root extends Component<any, State> {
     this.setState({ langSelectedToAdd: lang })
   }
 
-  getLoadedContent() {
-    return <>
-      <Cs2FormLine title={"Select mod"}>
-        <Cs2Select
-          options={Object.values(this.state.availableMods)}
-          getOptionLabel={(x: ModEntry) => x?.modName.split(",")[0]}
-          getOptionValue={(x: ModEntry) => x?.modId}
-          onChange={(x: ModEntry) => this.selectEditingMod(x)}
-          value={this.state.selectedMod}
-        />
-      </Cs2FormLine>
-      {this.state.selectedMod && !this.state.loadedError && this.state.loadedEntries &&
-        <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-around" }}>
-          <Cs2FormLine title={"Source Language"} className="thirdSelect">
-            {this.state.loadedEntries.availLangs.length > 1 ? <Cs2Select
-              options={this.state.loadedEntries.availLangs.map(x => { return { lang: x } })}
-              getOptionLabel={(x) => x.lang}
-              getOptionValue={(x) => x.lang}
-              onChange={(x) => this.setSourceLanguage(x.lang)}
-              value={{ lang: this.state.sourceLanguage }}
-            /> : this.state.loadedEntries.availLangs[0]}
-          </Cs2FormLine>
-          <Cs2FormLine title={"Target Language"} className="thirdSelect">
-            {Object.keys(this.state.extraLoadedLangs ?? {}).length > 1 ? <><Cs2Select
-              options={Object.keys(this.state.extraLoadedLangs).map(x => { return { lang: x } })}
-              getOptionLabel={(x) => x.lang}
-              getOptionValue={(x) => x.lang}
-              onChange={(x) => this.setTargetLanguage(x.lang)}
-              value={{ lang: this.state.targetLanguage }}
-            /></> : this.state.targetLanguage ?? "<None>"}
-          </Cs2FormLine>
-          <Cs2FormLine title={"Filter keys starting with"} className="thirdSelect">
-            <SimpleInput getValue={() => this.state.filterKeysStarting} onValueChanged={(x) => {
-              this.setState({ filterKeysStarting: x });
-              return x;
-            }} />
-          </Cs2FormLine>
-        </div>}
-      <GameScrollComponent>
-        {this.state.selectedMod && <>
-          {this.state.loadedError
-            ? <>ERROR! {this.state.loadedError}</>
-            : (Object.entries(this.state.loadedEntries?.entries ?? {})).filter(x => x[0].startsWith(this.state.filterKeysStarting ?? "")).map((e, i) => <Cs2FormLine
-              className="entryLine"
-              key={i}
-              title={e[1].languages[this.state.sourceLanguage]}
-              subtitle={<><i className="key">{e[0]}</i>{e[1].comments && <div className="comment">{e[1].comments}</div>}</>}>
-              {this.state.targetLanguage && <textarea style={{ width: "40%" }}
-                onChange={(x) => {
-                  this.state.extraLoadedLangs[this.state.targetLanguage][e[0]] = x.target.value;
-                  this.setState({ extraLoadedLangs: this.state.extraLoadedLangs });
-                }}
-                value={this.state.extraLoadedLangs[this.state.targetLanguage][e[0]] ?? ""}
-              />}
-            </Cs2FormLine>)}
-        </>}
-      </GameScrollComponent>
-    </>
-  }
-  setSourceLanguage(x: string): void {
-    this.setState({ sourceLanguage: x })
-  }
-  setTargetLanguage(x: string): void {
-    this.setState({ targetLanguage: x })
-  }
 
-  selectEditingMod(entry: ModEntry) {
-    this.setState({ selectedMod: entry }, () => this.loadEntries())
-  }
-  async loadEntries() {
-    if (!this.state.selectedMod) return this.setState({ loadedEntries: undefined, loadedError: undefined });
+  async selectEditingMod(entry: ModEntry) {
+    await new Promise((x) => this.setState({
+      selectedMod: undefined,
+      langSelectedToAdd: undefined,
+      selectedGroup: undefined,
+      keyGroups: undefined,
+      loadedEntries: undefined,
+      loadedError: undefined,
+      sourceLanguage: undefined,
+      extraLoadedLangs: undefined,
+      targetLanguage: undefined
+    }, () => x(0)));
+    if (!entry) return;
     const newLoadedEntries: EntriesData = {
       availLangs: [],
       entries: {}
     }
-    const mainFile = await FileService.readI18nCsv(this.state.selectedMod.mainFile, true);
+    const mainFile = await FileService.readI18nCsv(entry.mainFile, true);
     if (typeof mainFile == "number") return this.setState({ loadedEntries: undefined, loadedError: mainFile });
     newLoadedEntries.availLangs.push(...mainFile.columnsInformation.filter(x => !["key", "//", "/opt"].includes(x)))
     const keyIdx = mainFile.columnsInformation.indexOf("key");
@@ -180,22 +143,57 @@ export default class Root extends Component<any, State> {
       }
     }
     const newExtraFilesAvail: { [lang: string]: Record<string, string> } = {}
-    for (let extraFilePath of this.state.selectedMod.additionalFiles) {
+    for (let extraFilePath of entry.additionalFiles) {
       const extraFile = await FileService.readI18nCsv(extraFilePath, false);
-      if (typeof extraFile == "number") continue;
-      newExtraFilesAvail[extraFilePath.match(/[^a-zA-Z]([a-zA-Z0-9\-]+).csv/g)[1]] = Object.fromEntries(extraFile.entries.concat([extraFile.columnsInformation]));
+      if (typeof extraFile == "number") {
+        console.log(extraFile)
+        continue;
+      }
+      newExtraFilesAvail[[...extraFilePath.matchAll(/[^a-zA-Z]([a-zA-Z0-9\-]+).csv/g)][0][1]] = Object.fromEntries(extraFile.entries);
     }
-    return this.setState({ loadedEntries: newLoadedEntries, loadedError: undefined, sourceLanguage: "en-US", extraLoadedLangs: newExtraFilesAvail, targetLanguage: Object.keys(newExtraFilesAvail)[0] });
+    const keyGroups = await FileService.loadKeysGroups(entry.modId, entry.mainFile);
+
+    this.setState({
+      selectedMod: entry,
+      langSelectedToAdd: undefined,
+      selectedGroup: undefined,
+      keyGroups: Object.fromEntries(keyGroups || []),
+      loadedEntries: newLoadedEntries,
+      loadedError: undefined,
+      sourceLanguage: "en-US",
+      extraLoadedLangs: newExtraFilesAvail,
+      targetLanguage: Object.keys(newExtraFilesAvail)[0]
+    });
   }
 
   render() {
     return <>
-      {/* <button style={{ position: "fixed", right: 0, top: 0, zIndex: 999 }} onClick={() => location.reload()}>RELOAD!!!</button> */}
+      <button style={{ position: "fixed", right: 0, top: 0, zIndex: 999 }} onClick={() => location.reload()}>RELOAD!!!</button>
       <ErrorBoundary>
         <DefaultPanelScreen title="Live Translation Editor" subtitle="Open csv translation files from mods to edit them ingame; share them with devs later!" buttonsRowContent={this.getButtons()}>
-          {this.state.availableMods ? this.getLoadedContent() : this.getLoadingContent()}
+          {
+            this.state.availableMods && <>
+              <Cs2FormLine title={"Select mod"}>
+                <Cs2Select
+                  options={Object.values(this.state.availableMods)}
+                  getOptionLabel={(x: ModEntry) => x?.modName.split(",")[0]}
+                  getOptionValue={(x: ModEntry) => x?.modId}
+                  onChange={(x: ModEntry) => this.selectEditingMod(x)}
+                  value={this.state.selectedMod} />
+              </Cs2FormLine>
+              {this.state.instructionsView ? <>
+                <GameScrollComponent>
+                  <K45Markdown text={this.state.loadedMdText} />
+                </GameScrollComponent>
+              </> : <I18nEditorBody {...this.state} setState={(a, b) => this.setState(a, b)} />}
+            </>
+          }
+          {!this.state.availableMods && <h3>Loading</h3>}
+
         </DefaultPanelScreen>
+
       </ErrorBoundary>
     </>;
   }
 }
+

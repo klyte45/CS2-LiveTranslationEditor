@@ -12,7 +12,12 @@
     }
 
     &.thirdSelect {
-        width: 25%;
+        width: 35%;
+        display: flex;
+    }
+
+    &.halfSelect {
+        width: 55%;
         display: flex;
     }
 }
@@ -52,4 +57,36 @@ button[disabled] {
     border-width: 1rem;
     border-style: solid;
     border-color: gray;
+}
+
+.emptyEntry {
+    color: red;
+}
+
+.validationErrors {
+    color: red;
+    white-space: pre;
+    text-align: right;
+    padding-right: 5rem;
+}
+
+textarea.invalid {
+    background-color: rgb(65, 0, 0);
+    color: lightcoral;
+    border-color: darkred;
+}
+
+.actionBtns button {
+    height: 30rem;
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+
+.footResume {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    font-size: var(--fontSizeXS);
+    padding-top: 4rem;    
+    color: var(--normalTextColorDimmer);
 }

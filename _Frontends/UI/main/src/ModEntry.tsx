@@ -6,16 +6,18 @@ export type ModEntry = {
   additionalFiles: string[];
 };
 
+export type LanguageEntry = {
+  languages: {
+    [langId: string]: string;
+  };
+  arguments: string[];
+  comments?: string;
+  opts?: number;
+};
+
 export type EntriesData = {
   availLangs: string[],
   entries: {
-    [key: string]: {
-      languages: {
-        [langId: string]: string,
-      },
-      arguments: string[],
-      comments?: string,
-      opts?: number,
-    }
+    [key: string]: LanguageEntry
   }
 }

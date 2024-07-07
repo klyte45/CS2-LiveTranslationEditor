@@ -1,0 +1,21 @@
+.k45_mdContainer {
+    display: flex;
+    flex-direction: column;
+
+    p {
+        color: var(--menuText1Normal);
+
+        .md_bold {
+            font-weight: bold;
+        }
+
+        .md_ital {
+            color: var(--accentColorNormal);
+        }
+
+        .md_boldItal {
+            font-weight: bold;
+            color: var(--accentColorNormal);
+        }
+    }
+}
