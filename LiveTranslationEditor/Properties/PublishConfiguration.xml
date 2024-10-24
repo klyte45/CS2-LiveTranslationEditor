@@ -1,5 +1,5 @@
 <Publish>
-  <ModId Value="" />
+  <ModId Value="84657" />
   <DisplayName Value="Live Translation Editor" />
   <ShortDescription Value="Edit translations directly ingame! Export csv files to share later." />
   <LongDescription>This mod is an utility for mod creators and translators to test and create new translations for mods directly from inside the game. Modders can provide methods to hot reloading the translations and translators can check if the written translation makes sense where it is used.
@@ -101,10 +101,10 @@ Supported markdown:
 Notice that it's a very simple markdown implementation and not all edge cases are tested due COUI limitations. Test your markdown before distributing with your mod.</LongDescription>
   <Thumbnail Value="Properties/Thumbnail.png" />
   <ForumLink Value="" />
-  <ModVersion Value="0.1.0.0" />
+  <ModVersion Value="0.1.0.1" />
   <GameVersion Value="1.1.*" />
-  <ChangeLog># v0.1.0r0 (07-JUL-24)
-- Initial release</ChangeLog>
+  <ChangeLog># v0.1.0r1 (24-OCT-24)
+- Recompiled for 1.1.11</ChangeLog>
   <Tag Value="Code Mod" />
   <Screenshot Value="Screenshots\00_empty.jpg" />
   <Screenshot Value="Screenshots\01_base.jpg" />
