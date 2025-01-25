@@ -6,6 +6,8 @@
 
 Regular users (that not translates nor develop mods) ***DON'T NEED THIS MOD***
 
+&gt; NOTICE: EUIS applications integration reference at bottom of this page - for those coming from EUIS mod page
+
 ## References for translators
 
 - This mod only have screens inside EUIS overlay/monitor. You will see a icon in the EUIS taskbar after adding this mod.
@@ -98,16 +100,28 @@ Supported markdown:
   - The backslash may be used to escape the below characters too
   - use two backslashes to show the backslash char: \\\\
 
-Notice that it's a very simple markdown implementation and not all edge cases are tested due COUI limitations. Test your markdown before distributing with your mod.</LongDescription>
+Notice that it's a very simple markdown implementation and not all edge cases are tested due COUI limitations. Test your markdown before distributing with your mod.
+
+## EUIS integration reference
+
+- Go to `LiveTranslationEditorMod.cs` file
+- Copy whole `#region EUIS utility` to the mod you want to integrate with EUIS
+- Change the fields `EuisModderIdentifier`, `EuisModAcronym` and `LocalPort` for desired values (following EUIS rules)
+- Replace closure contents of `EuisCallersRegister`, `SendEventToEuis` and `EuisTriggersRegister` to bind triggers/calls (read comments above them for details)
+- Replace the content of the Dictionary `EuisApps`, using the application name as key and declaring a new app record like the sample from this mod. You can add how many apps you want.
+- Add the line `GameManager.instance.RegisterUpdater(RegisterAtEuis);` inside your `OnLoad` method
+- Done! Your mod EUIS applications will appear in all screens enabled.</LongDescription>
   <Thumbnail Value="Properties/Thumbnail.png" />
   <ForumLink Value="" />
-  <ModVersion Value="0.1.0.1" />
-  <GameVersion Value="1.1.*" />
-  <ChangeLog># v0.1.0r1 (24-OCT-24)
-- Recompiled for 1.1.11</ChangeLog>
+  <ModVersion Value="0.1.0.2" />
+  <GameVersion Value="1.2.*" />
+  <ChangeLog># v0.1.0r2 (25-JAN-25)
+- Updating to be compatible with EUIS 0.2</ChangeLog>
   <Tag Value="Code Mod" />
   <Screenshot Value="Screenshots\00_empty.jpg" />
   <Screenshot Value="Screenshots\01_base.jpg" />
   <Screenshot Value="Screenshots\02_md.jpg" />
   <Dependency Id="74151" ModVersion="" DisplayName="Extra UI Screens" />
+  <ExternalLink Type="youtube" Url="https://www.youtube.com/Klyte45" />
+  <ExternalLink Type="kofi" Url="https://ko-fi.com/klyte45" />
 </Publish>

@@ -2,6 +2,8 @@ This mod is an utility for mod creators and translators to test and create new t
 
 Regular users (that not translates nor develop mods) ***DON'T NEED THIS MOD***
 
+> NOTICE: EUIS applications integration reference at bottom of this page - for those coming from EUIS mod page
+
 ## References for translators
 
 - This mod only have screens inside EUIS overlay/monitor. You will see a icon in the EUIS taskbar after adding this mod.
@@ -95,3 +97,13 @@ Supported markdown:
   - use two backslashes to show the backslash char: \\\\
 
 Notice that it's a very simple markdown implementation and not all edge cases are tested due COUI limitations. Test your markdown before distributing with your mod.
+
+## EUIS integration reference
+
+- Go to `LiveTranslationEditorMod.cs` file
+- Copy whole `#region EUIS utility` to the mod you want to integrate with EUIS
+- Change the fields `EuisModderIdentifier`, `EuisModAcronym` and `LocalPort` for desired values (following EUIS rules)
+- Replace closure contents of `EuisCallersRegister`, `SendEventToEuis` and `EuisTriggersRegister` to bind triggers/calls (read comments above them for details)
+- Replace the content of the Dictionary `EuisApps`, using the application name as key and declaring a new app record like the sample from this mod. You can add how many apps you want.
+- Add the line `GameManager.instance.RegisterUpdater(RegisterAtEuis);` inside your `OnLoad` method
+- Done! Your mod EUIS applications will appear in all screens enabled.

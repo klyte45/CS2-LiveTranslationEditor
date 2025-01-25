@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  
+ 
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net472</TargetFramework>
@@ -13,6 +12,7 @@
     <Bursted>false</Bursted>
     <DefineConstants Condition="$(Bursted)">BURST</DefineConstants>
     <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
+    <IsBelzontCommonsMod>false</IsBelzontCommonsMod>
   </PropertyGroup>
 
   <!--Imports must be after PropertyGroup block-->
@@ -26,8 +26,8 @@
   <!--Mod data-->
   <PropertyGroup>
     <ModId>84657</ModId>
-    <Version>0.1.0.1</Version>
-    <GameVersion>1.1.*</GameVersion>
+    <Version>0.1.0.2</Version>
+    <GameVersion>1.2.*</GameVersion>
     <ThumbnailPath>Properties/Thumbnail.png</ThumbnailPath>
     <DisplayName>Live Translation Editor</DisplayName>
     <ShortDescription>Edit translations directly ingame! Export csv files to share later.</ShortDescription>
@@ -44,25 +44,8 @@
       <DisplayName>Extra UI Screens</DisplayName>
     </Dependency>
   </ItemGroup>
-
-  <Target Name="EUIS Build" BeforeTargets="DeployWIP" AfterTargets="RunModPostProcessor">
-    <Message Importance="high" Text="EUIS Build!" />
-    <MSBuild Projects="../LTE_EUIS/LTE_EUIS.csproj" Targets="Build" BuildInParallel="false" />
-    <ItemGroup>
-      <EuisResult Include="..\LTE_EUIS\bin\$(Configuration)\$(TargetFramework)\*.euis" />
-    </ItemGroup>
-    <Copy SourceFiles="@(EuisResult)" DestinationFolder="$(OutDir)" ContinueOnError="false" />
-    
-  </Target>
-
-
+  
   <ItemGroup>
-    <Reference Include="K45EUIS_Ext">
-      <HintPath>$(K45_CS2_ALLROOT)\ExtraUIScreens\K45EUIS_Ext\bin\$(Configuration)\$(TargetFramework)\K45EUIS_Ext.dll</HintPath>
-      <Private>False</Private>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
     <Reference Include="Game">
       <HintPath>$(K45_CS2_ALLROOT)\_Managed DLLs\Game.dll</HintPath>
       <Private>false</Private>
@@ -204,7 +187,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="changelog.md" />
-    <Resource Remove="longDescription.md" />
+    <Resource Remove="README.md" />
   </ItemGroup>
 
 </Project>

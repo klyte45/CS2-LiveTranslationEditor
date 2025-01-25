@@ -1,4 +1,8 @@
-﻿using Colossal;
+﻿#if !RELEASE
+#define LOCAL
+#endif
+
+using Colossal;
 using Colossal.IO.AssetDatabase;
 using Game;
 using Game.Modding;
@@ -15,16 +19,83 @@ namespace LiveTranslationEditor
 {
     public class LiveTranslationEditorMod : IMod
     {
-        public const string CouiHost = "lte.k45";
-        public void OnDispose()
-        {
-
-        }
+        public void OnDispose() { }
 
         public void OnLoad(UpdateSystem updateSystem)
         {
             GameManager.instance.userInterface.view.uiSystem.AddHostLocation(CouiHost, new HashSet<string> { ModInstallFolder });
+            GameManager.instance.RegisterUpdater(RegisterAtEuis);
+        }       
+
+        #region EUIS utility
+
+        public static readonly string EuisModderIdentifier = "k45";
+        public static readonly string EuisModAcronym = "lte";
+        public const ushort LocalPort = 8780;
+
+        protected virtual Dictionary<string, EuisAppRegister> EuisApps => new()
+        {
+            ["main"] = new("Live Translation Editor", "main", $"coui://{CouiHost}/UI/images/LTE.svg")
+        };
+
+
+        protected static readonly string CouiHost = $"{EuisModAcronym}.{EuisModderIdentifier}";
+
+#if LOCAL
+        private static string BaseUrlApps => $"http://localhost:{LocalPort}";
+#else
+        private static string BaseUrlApps => $"coui://{CouiHost}/UI";
+#endif
+
+        private void RegisterAtEuis()
+        {
+            var euisAsset = AssetDatabase.global.GetAsset(SearchFilter<ExecutableAsset>.ByCondition(asset => asset.isEnabled && asset.isLoaded && asset.name.Equals("ExtraUIScreens")));
+            if (euisAsset is null)
+            {
+                throw new Exception($"The mod {nameof(LiveTranslationEditor)} requires Extra UI Screens mod to work!");
+
+            }
+            var bridgeClass = euisAsset.assembly.GetExportedTypes().FirstOrDefault(x => x.Name == "EuisExternalRegisterBridge")
+                ?? throw new Exception($"Incorrect version of EUIS loaded for mod {nameof(LiveTranslationEditor)}!\nEnsure its version is 0.2.0 or higher.");
+
+            bridgeClass.GetMethod("RegisterModForEUIS").Invoke(null, new object[] { EuisModderIdentifier, EuisModAcronym, SendEventToEuis, EuisTriggersRegister, EuisCallersRegister });
+            var registerAppMethod = bridgeClass.GetMethod("RegisterAppForEUIS");
+            foreach (var app in EuisApps)
+            {
+                registerAppMethod.Invoke(null, new object[] { EuisModderIdentifier, EuisModAcronym, app.Key, app.Value.DisplayName, app.Value.UrlJs, app.Value.UrlCss, app.Value.UrlIcon }); ;
+            }
         }
+
+
+        protected record EuisAppRegister(string DisplayName, string AppName, string UrlIcon)
+        {
+            public string UrlJs => $"{BaseUrlApps}/{EuisModderIdentifier}-{EuisModAcronym}-{AppName}.js";
+            public string UrlCss => $"{BaseUrlApps}/{EuisModderIdentifier}-{EuisModAcronym}-{AppName}.css";
+        }
+
+
+        //Use this event caller to register the handler for call() usages at EUIS frontend. The call() method awaits for a response. All calls are prefixed with modder and mod acronyms in the format "mdd:mod.action"
+        public static readonly Action<Action<string, Delegate>> EuisCallersRegister = (callRegister) =>
+        {
+            callRegister("getModsAvailableToTranslate", GetModsAvailableToTranslate);
+            callRegister("readI18nCsv", ReadI18nCsv);
+            callRegister("saveI18nCsv", SaveI18nCsv);
+            callRegister("getGameLanguages", GetGameLanguages);
+            callRegister("openFileInExplorer", OpenFileInExplorer);
+            callRegister("launchGoogleTranslateInBrowser", LaunchGoogleTranslateInBrowser);
+            callRegister("loadKeysGroups", LoadKeysGroups);
+            callRegister("openArbitraryUrl", OpenArbitraryUrl);
+            callRegister("loadInstructions", LoadInstructions);
+        };
+
+        //Store the eventCaller somewhere to use it to send data to all EUIS screens.All calls are prefixed with modder and mod acronyms in the format "mdd:mod.action". (Unnecessary at the LTE)
+        public static readonly Action<Action<string, object[]>> SendEventToEuis = (eventCaller) => { };
+
+
+        //Use this event caller to register the handler for trigger() usages at EUIS frontend. The trigger() method *doesn't* awaits for a response. All calls are prefixed with modder and mod acronyms in the format "mdd:mod.action". (Unnecessary at the LTE)
+        public static readonly Action<Action<string, Delegate>> EuisTriggersRegister = (triggerRegister) => { };
+
+        #endregion
 
         private static string m_modInstallFolder;
         public static string ModInstallFolder
@@ -45,18 +116,6 @@ namespace LiveTranslationEditor
             }
         }
 
-        public static readonly Action<Action<string, Delegate>> EuisCallersRegister = (eventCaller) =>
-        {
-            eventCaller("getModsAvailableToTranslate", GetModsAvailableToTranslate);
-            eventCaller("readI18nCsv", ReadI18nCsv);
-            eventCaller("saveI18nCsv", SaveI18nCsv);
-            eventCaller("getGameLanguages", GetGameLanguages);
-            eventCaller("openFileInExplorer", OpenFileInExplorer);
-            eventCaller("launchGoogleTranslateInBrowser", LaunchGoogleTranslateInBrowser);
-            eventCaller("loadKeysGroups", LoadKeysGroups);
-            eventCaller("openArbitraryUrl", OpenArbitraryUrl);
-            eventCaller("loadInstructions", LoadInstructions);
-        };
 
         public struct ModEntry
         {
